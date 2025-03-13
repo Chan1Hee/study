@@ -1,0 +1,69 @@
+module tf_rcc4; //test  
+
+	// Inputs
+	reg clk;
+	reg reset;
+
+	// Outputs
+	wire [3:0] q;
+
+	// Instantiate the Unit Under Test (UUT)
+	ripple_carry_counter_4 uut (
+		.q(q), 
+		.clk(clk), 
+		.reset(reset)
+	);
+
+	initial 
+		clk = 1'b0; //clk를 0으로 설정 
+		always
+		#5 clk = ~clk; //매 5단위 시간마다 clk값을 바꾼다.
+	 initial
+		begin
+		reset = 1'b1;
+		#5 reset = 1'b0;
+		#180reset = 1'b1;
+		#10 reset = 1'b0;
+	end
+      
+endmodule
+
+
+module ripple_carry_counter_4(q,clk,reset);
+    output [3:0] q;
+	 input clk,reset;
+	 
+	 T_FF tff0 (q[0], clk, reset);
+	 T_FF tff1 (q[1], q[0], reset);
+	 T_FF tff2 (q[2], q[1], reset);
+	 T_FF tff3 (q[3], q[2], reset);
+
+
+endmodule
+
+
+module T_FF(q,clk,reset);
+		
+		output q;
+		input clk, reset;
+		wire d;
+		
+		D_FF dff0 (q, d ,clk, reset);
+		not n1(d, q);;
+
+endmodule
+
+
+module D_FF(q,d,clk,reset);
+		
+		output q;
+		input d, clk, reset;
+		reg q;
+		
+		always@(negedge clk or posedge reset)
+			if(reset)
+				q <=1'b0;
+			else
+				q <=d;
+
+endmodule
